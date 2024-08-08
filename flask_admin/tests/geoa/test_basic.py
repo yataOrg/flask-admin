@@ -9,8 +9,6 @@ from flask_admin.contrib.geoa.fields import GeoJSONField
 from geoalchemy2 import Geometry
 from geoalchemy2.shape import to_shape
 
-from . import setup
-
 
 def create_models(db):
     class GeoModel(db.Model):
@@ -27,9 +25,7 @@ def create_models(db):
     return GeoModel
 
 
-@pytest.mark.filterwarnings("ignore:Please update your type formatter:UserWarning")
-def test_model():
-    app, db, admin = setup()
+def test_model(app, db, admin):
     GeoModel = create_models(db)
     with app.app_context():
         db.create_all()
@@ -128,8 +124,7 @@ def test_model():
     assert db.session.query(GeoModel).count() == 0
 
 
-def test_none():
-    app, db, admin = setup()
+def test_none(app, db, admin):
     GeoModel = create_models(db)
     with app.app_context():
         db.create_all()

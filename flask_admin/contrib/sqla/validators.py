@@ -4,6 +4,7 @@ from wtforms import ValidationError
 from wtforms.validators import InputRequired
 
 from flask_admin._compat import filter_list
+from flask_admin.babel import lazy_gettext
 
 
 class Unique(object):
@@ -18,13 +19,13 @@ class Unique(object):
     :param message:
         The error message.
     """
-    field_flags = ('unique', )
+    field_flags = {'unique': True}
 
     def __init__(self, db_session, model, column, message=None):
         self.db_session = db_session
         self.model = model
         self.column = column
-        self.message = message
+        self.message = message or lazy_gettext('Already exists.')
 
     def __call__(self, form, field):
         # databases allow multiple NULL values for unique columns
@@ -37,9 +38,7 @@ class Unique(object):
                    .one())
 
             if not hasattr(form, '_obj') or not form._obj == obj:
-                if self.message is None:
-                    self.message = field.gettext(u'Already exists.')
-                raise ValidationError(self.message)
+                raise ValidationError(str(self.message))
         except NoResultFound:
             pass
 
